@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.679,C:\Users\Baburin\Documents\RAD Studio\Projects\Project1.dproj=C:\Users\Baburin\Documents\RAD Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.619,C:\Users\Baburin\Documents\RAD Studio\Projects\Новая папка (3)\Project1.dproj=C:\Users\Baburin\Documents\RAD Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.652,=C:\Users\Baburin\Documents\RAD Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2014.11.11 17:12:36.272,=Z:\Work\folder\Unit1.pas</Transaction>
+    <Transaction>2014.11.11 17:12:45.932,Z:\Work\folder\Types.pas=Z:\Work\folder\Unit1.pas</Transaction>
+    <Transaction>2014.11.11 17:12:52.588,Z:\Work\folder\CustomTypes.pas=Z:\Work\folder\Types.pas</Transaction>
+    <Transaction>2014.11.11 17:41:05.925,Z:\GIT\ConvertTool\Project1.dproj=Z:\Work\folder\Project1.dproj</Transaction>
+  </Transactions>
+</BorlandProject>
