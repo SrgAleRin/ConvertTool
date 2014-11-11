@@ -221,3 +221,7 @@ pip-log.txt
 ## Delphi
 #############
 *.local
+.local
+*.local
+*.identcache
+*.local

@@ -67,6 +67,8 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="CustomTypes.pas"/>
+			<DCCReference Include="CTSysUtils.pas"/>
+			<DCCReference Include="GhostAPI.pas"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

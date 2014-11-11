@@ -7,6 +7,7 @@ Type
     AdditionalGhostscriptParameters: String;
     AdditionalGhostscriptSearchpath: String;
     AddWindowsFontpath: LongInt;
+    AllowSpecialGSCharsInFilenames: LongInt;
     AutosaveDirectory: String;
     AutosaveFilename: String;
     AutosaveFormat: LongInt;
@@ -36,7 +37,10 @@ Type
     NoConfirmMessageSwitchingDefaultprinter: LongInt;
     NoProcessingAtStartup: LongInt;
     NoPSCheck: LongInt;
-    OnePagePerFile: LongInt;
+    OneFilePerPage: LongInt;
+    OneFilePerPageLeadingChar: LongInt;
+    OneFilePerPageMaxCountOfLeadingChars: LongInt;
+    OpenOutputFile: LongInt;
     OptionsDesign: LongInt;
     OptionsEnabled: LongInt;
     OptionsVisible: LongInt;
@@ -176,11 +180,116 @@ Type
     UseStandardAuthor: LongInt;
   End;
 
+  EncryptionStrength = (encLow,encStrong);
+
+  EncryptData = record
+    InputFile: String;
+    OutputFile: String;
+    UserPass: String;
+    OwnerPass: String;
+    DisallowPrinting: Boolean;
+    DisallowModifyContents: Boolean;
+    DisallowCopy: Boolean;
+    DisallowModifyAnnotations: Boolean;
+    AllowFillIn: Boolean;
+    AllowScreenReaders: Boolean;
+    AllowAssembly: Boolean;
+    AllowDegradedPrinting: Boolean;
+    EncryptionLevel: EncryptionStrength;
+  End;
+
   tGhostscriptDevice = (PDFWriter,PNGWriter,JPEGWriter,BMPWriter,PCXWriter,
                         TIFFWriter,PSWriter,EPSWriter,TXTWriter,PDFAWriter,
                         PDFXWriter,PSDWriter,PCLWriter,RAWWriter,SVGWriter);
 
   tPDFAFormat = (PDFA1b,PDFA2b);
+
+  clsGhostscript = record
+    VersionInternal: Boolean;
+    VersionMajor: Integer;
+    VersionMinor: Integer;
+    Description: String;
+  end;
+
+  tGhostscriptRevision = record
+    strProduct: String;
+    strCopyright: String;
+    intRevision: Integer;
+    intRevisionDate: Integer;
+  end;
+
+
+
+
+var
+//'General
+GS_PDFDEFAULT: string;
+GS_COMPATIBILITY: string;
+GS_AUTOROTATE: string;
+GS_OVERPRINT: string;
+GS_ASCII85: string;
+
+//'Compression
+GS_COMPRESSPAGES: string;
+GS_COMPRESSCOLOR: string;
+GS_COMPRESSGREY: string;
+GS_COMPRESSMONO: string;
+GS_COMPRESSCOLORMETHOD: string;
+GS_COMPRESSGREYMETHOD: string;
+GS_COMPRESSMONOMETHOD: string;
+GS_COMPRESSCOLORVALUE: string;
+GS_COMPRESSGREYVALUE: string;
+GS_COMPRESSMONOVALUE: string;
+GS_COMPRESSCOLORLEVEL: string;
+GS_COMPRESSGREYLEVEL: string;
+GS_COMPRESSCOLORAUTO: string;
+GS_COMPRESSGREYAUTO: string;
+GS_COLORRESOLUTION: string;
+GS_GREYRESOLUTION: string;
+GS_MONORESOLUTION: string;
+GS_COLORRESAMPLE: string;
+GS_GREYRESAMPLE: string;
+GS_MONORESAMPLE: string;
+GS_COLORRESAMPLEMETHOD: string;
+GS_GREYRESAMPLEMETHOD: string;
+GS_MONORESAMPLEMETHOD: string;
+
+//'Fonts
+GS_EMBEDALLFONTS: string;
+GS_SUBSETFONTS: string;
+GS_SUBSETFONTPERC: string;
+GS_KEEPFONTNAMES: string;
+
+//'Colors
+GS_COLORMODEL: string;
+GS_CMYKTORGB: string;
+GS_PRESERVEOVERPRINT: string;
+GS_TRANSFERFUNCTIONS: string;
+GS_HALFTONE: string;
+
+//'Bitmap
+GS_PNGColorscount: string;
+GS_JPEGColorscount: string;
+GS_BMPColorscount: string;
+GS_PCXColorscount: string;
+GS_TIFFColorscount: string;
+GS_JPEGQuality: string;
+GS_PSDColorscount: string;
+GS_PCLColorscount: string;
+GS_RAWColorscount: string;
+
+//'Postscript
+GS_PSLanguageLevel: string;
+GS_EPSLanguageLevel: string;
+
+
+GS_ERROR: Integer;
+UseReturnPipe: Integer;
+
+GSRevision: tGhostscriptRevision;
+
+GSParams: array of string;
+GSParamsIndex: Integer;
 
 
 
