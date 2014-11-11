@@ -6,7 +6,7 @@ program Project1;
 
 uses
   System.SysUtils,
-  CustomTypes in 'Z:\Work\folder\CustomTypes.pas';
+  CustomTypes in 'CustomTypes.pas';
 
 procedure CallGScript(GSInfoSpoolFile: String; GSOutputFile: String; Options: tOptions;
          Ghostscriptdevice: tGhostscriptDevice; PDFDocInfoFile: String;
