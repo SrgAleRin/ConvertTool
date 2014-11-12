@@ -8,6 +8,9 @@ uses CustomTypes;
   procedure SelectMonoCompression(Value: integer);
   function BoolInt2Str(Value: Integer; UseBoolStr: Boolean = True): string;
   function GetGhostscriptVersion(): clsGhostscript;
+  Function GetFontsDirectory(): String;
+  Function DotNet20Installed(): Boolean;
+  Function pdfforgeDllIsInstalled(): Boolean;
 
 implementation
 uses SysUtils, Registry, Windows;
@@ -155,6 +158,19 @@ begin
   Result := tStr;
 End;
 
+Function DotNet20Installed(): Boolean;
+begin
+  Result := DirectoryExists(GetEnvironmentVariable('WinDir') + 'Microsoft.NET\Framework\v2.0.50727');
+End;
+
+Function pdfforgeDllIsInstalled(): Boolean;
+begin
+  Result := False;
+//  If FileExists(PDFCreatorApplicationPath + 'PlugIns\pdfforge\pdfforge.dll') And
+//     FileExists(PDFCreatorApplicationPath + 'PlugIns\pdfforge\itextsharp.dll')
+//  Then
+//    Result := True;
+End;
 
 
 
