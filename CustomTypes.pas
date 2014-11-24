@@ -218,7 +218,18 @@ Type
     intRevisionDate: Integer;
   end;
 
+  tPDFDocInfo = record
+    Author: String;
+    CreationDate: String;
+// CreationDate = "D:" & Format(Now, "YYYYMMDDHHNNSS")
+    Creator: String;
+    Keywords: String;
+    ModifyDate: String;
+    Subject: String;
+    Title: String;
+   End;
 
+   eCodePage = (CP_NoEncoding = 0,CP_UTF8 = 65001,CP_UTF16 = 65002);
 
 
 var

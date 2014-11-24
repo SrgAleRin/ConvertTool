@@ -2,6 +2,8 @@ unit GhostAPI;
 
 interface
 
+Function CallGS(astrGSArgs: array of string): Boolean;
+
 implementation
 uses SysUtils;
 
@@ -25,6 +27,7 @@ Function gsapi_init_with_args(lngGSInstance: Longint; lngArgumentCount: Longint;
 Function gsapi_run_file(lngGSInstance: Longint; strFileName: widestring;
                         intErrors: Longint; intExitCode: Longint): Longint; external GsDll;
 Function gsapi_exit(lngGSInstance: Longint): Longint; external GsDll;
+
 //------------------------------------------------
 //API Calls End
 //------------------------------------------------
@@ -57,9 +60,10 @@ End;
 
 Function CallGS(astrGSArgs: array of string): Boolean;
 var intReturn,intGSInstanceHandle,
-    intCounter,intElementCount,callerHandle,ptrArgs: Integer;
+    intCounter,intElementCount,callerHandle: Integer;
+    ptrArgs: Pointer;
     aAnsiArgs: array of String;
-    aPtrArgs: array of Longint;
+    aPtrArgs: array of PChar;
 begin
 //     ' Print out the revision details.
 //     ' If we want to insist on a particular version of Ghostscript
@@ -73,7 +77,6 @@ begin
   If (intReturn < 0) Then
   begin
     CallGS := False;
-//    IfLoggingWriteLogfile "Error: (gsapi_new_instance result = " & intReturn & "): " & GS_OutStr
     Exit;
   end;
 
@@ -81,36 +84,24 @@ begin
 
   If (intReturn >= 0) Then
   begin
-//         ' Convert the Unicode strings to null terminated ANSI byte arrays
-//         ' then get pointers to the byte arrays.
     intElementCount := High(astrGSArgs);
     SetLength(aAnsiArgs,intElementCount);
     SetLength(aPtrArgs,intElementCount);
     For intCounter := 0 To intElementCount do
     begin
-      aAnsiArgs[intCounter] := StrConv(astrGSArgs(intCounter), vbFromUnicode);
-      aPtrArgs[intCounter] := PChar(aAnsiArgs(intCounter));
+      aAnsiArgs[intCounter] := astrGSArgs[intCounter];
+      aPtrArgs[intCounter] := PChar(aAnsiArgs[intCounter]);
     end;
     ptrArgs := @aPtrArgs[0];
-    intReturn := gsapi_init_with_args(intGSInstanceHandle, intElementCount + 1, ptrArgs);
-  //       ' Stop the Ghostscript interpreter
+    intReturn := gsapi_init_with_args(intGSInstanceHandle, intElementCount + 1, integer(ptrArgs));
     gsapi_exit(intGSInstanceHandle);
-  End;
+  end;
 
-//     ' release the Ghostscript instance handle
   gsapi_delete_instance (intGSInstanceHandle);
-// '    Debug.Print intReturn
   If (intReturn >= 0) Then
-   CallGS = True
+   CallGS := True
   Else
-  begin
-   If (intReturn <> e_Quit) And (intReturn <> e_Info) Then
-   begin
-//    GhostscriptError := intReturn;
-//    IfLoggingWriteLogfile "Error: " & Replace$(GS_OutStr, vbCrLf, "; ");
-   end;
-   CallGS = False;
-  End;
+   CallGS := False;
 End;
 
 
