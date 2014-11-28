@@ -9,11 +9,14 @@ uses CustomTypes;
   function BoolInt2Str(Value: Integer; UseBoolStr: Boolean = True): string;
   function GetGhostscriptVersion(): clsGhostscript;
   Function GetFontsDirectory(): String;
+<<<<<<< HEAD
   Function DotNet20Installed(): Boolean;
   Function pdfforgeDllIsInstalled(): Boolean;
+=======
+>>>>>>> origin/master
 
 implementation
-uses SysUtils, Registry, Windows;
+uses SysUtils, Registry, Windows, Classes;
 
 procedure SelectColorCompression(Value: Integer);
 begin
@@ -158,6 +161,7 @@ begin
   Result := tStr;
 End;
 
+<<<<<<< HEAD
 Function DotNet20Installed(): Boolean;
 begin
   Result := DirectoryExists(GetEnvironmentVariable('WinDir') + 'Microsoft.NET\Framework\v2.0.50727');
@@ -171,6 +175,90 @@ begin
 //  Then
 //    Result := True;
 End;
+=======
+Function GetMetadataString(PDFDocInfo: tPDFDocInfo): String;
+var PDFDocInfoStr,tStr,ttStr: String;
+//    tzi: clsTimeZoneInformation;
+    CodePage: LongInt;
+    LBytes,RBytes: TBytes;
+    Ansi,Code: TEncoding;
+begin
+  CodePage := eCodePage.CP_UTF16;
+  With PDFDocInfo do
+  begin
+   PDFDocInfoStr := PDFDocInfoStr + #13;
+   If Length(Trim(Author)) > 0 Then
+   begin
+     Ansi := TEncoding.ANSI.Create;
+     Code := TEncoding.GetEncoding(CodePage).Create;
+     LBytes := Ansi.GetBytes(Author);
+     RBytes := TEncoding.Convert(Ansi,Code,LBytes);
+     tStr := Code.GetString(RBytes);
+   end
+   Else
+     tStr := '()';
+
+   PDFDocInfoStr := PDFDocInfoStr + #13 + '/Author ' + tStr;
+   If (Length(CreationDate) > 0) Or (Length(ModifyDate) > 0) Then
+   begin
+//    Set tzi = New clsTimeZoneInformation
+    If tzi.DayLight Then
+      ttStr = Format(TimeSerial(0, tzi.DaylightToGMT, 0), "hh'mm'")
+    Else
+      ttStr = Format(TimeSerial(0, tzi.NormaltimeToGMT, 0), "hh'mm'");
+
+    If tzi.DaylightToGMT >= 0 Then
+      ttStr = '+' + ttStr
+    Else
+      ttStr = '-' + ttStr;
+   End;
+
+   If Length(Trim(CreationDate)) > 0 Then
+     tStr := '(D:' + AdjustCultureCalendar(CreationDate) + ttStr + ')'
+   Else
+     tStr := '()';
+
+   PDFDocInfoStr = PDFDocInfoStr & Chr$(13) & "/CreationDate " & tStr
+   If LenB(.Creator) > 0 Then
+     tStr = EncodeChars(CodePage, .Creator)
+    Else
+     tStr = "()"
+   End If
+   PDFDocInfoStr = PDFDocInfoStr & Chr$(13) & "/Creator " & tStr
+   If LenB(Trim$(.Keywords)) > 0 Then
+     tStr = EncodeChars(CodePage, .Keywords)
+    Else
+     tStr = "()"
+   End If
+   PDFDocInfoStr = PDFDocInfoStr & Chr$(13) & "/Keywords " & tStr
+   If LenB(Trim$(.ModifyDate)) > 0 Then
+     tStr = "(D:" & AdjustCultureCalendar(.ModifyDate) & ttStr & ")"
+    Else
+     tStr = "()"
+   End If
+   PDFDocInfoStr = PDFDocInfoStr & Chr$(13) & "/ModDate " & tStr
+   If LenB(.CreationDate) > 0 Or LenB(.ModifyDate) > 0 Then
+    Set tzi = Nothing
+   End If
+   If LenB(Trim$(.Subject)) > 0 Then
+     tStr = EncodeChars(CodePage, .Subject)
+    Else
+     tStr = "()"
+   End If
+   PDFDocInfoStr = PDFDocInfoStr & Chr$(13) & "/Subject " & tStr
+   If LenB(Trim$(.Title)) > 0 Then
+     tStr = EncodeChars(CodePage, .Title)
+    Else
+     tStr = "()"
+   End If
+   PDFDocInfoStr = PDFDocInfoStr & Chr$(13) & "/Title " & tStr
+  End With
+  end;
+  GetMetadataString = PDFDocInfoStr
+End;
+
+
+>>>>>>> origin/master
 
 
 

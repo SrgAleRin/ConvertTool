@@ -222,7 +222,11 @@ End;
 
 
 procedure CreatePDFA(const InfoSpoolFileName,PDFDocInfoFile,
+<<<<<<< HEAD
                     StampFile,PDFDocViewFile: String; var GSOutputFile: string;
+=======
+                    StampFile,PDFDocViewFile: String; GSOutputFile: string;
+>>>>>>> origin/master
                     Options: tOptions; PDFAFormat: tPDFAFormat);
 var tStr: String;
     AdditionalFiles: TStringList;
@@ -282,7 +286,11 @@ begin
   end;
 
   If (Options.AllowSpecialGSCharsInFilenames = 1) And (Options.OneFilePerPage <> 1) Then
+<<<<<<< HEAD
     GSOutputFile := StringReplace(GSOutputFile, '%', '%%', [rfReplaceAll, rfIgnoreCase]);
+=======
+    GSOutputFile := StringReplace(GSOutputFile, '%', '%%',[rfReplaceAll, rfIgnoreCase]);
+>>>>>>> origin/master
   AddParams('-sOutputFile=' + GSOutputFile);
 
   If Options.DontUseDocumentSettings = 0 Then
@@ -338,6 +346,7 @@ begin
   GSInit(Options);
 
   Case Ghostscriptdevice of
+<<<<<<< HEAD
     PDFAWriter:
        begin //PDFA
          CreatePDFA(GSInfoSpoolFile, PDFDocInfoFile, StampFile, PDFDocViewFile,
@@ -540,6 +549,201 @@ begin
     FillChar(Options,SizeOf(Options),#0);
     CallGScript('G:\garbage\описание проблемы.docx', 'G:\garbage\описание проблемы.pdf', Options,
                 Options.AutosaveFormat, PDFDocInfoFile, StampFile,
+=======
+    PDFAWriter: begin //PDFA
+                 CreatePDFA(GSInfoSpoolFile, PDFDocInfoFile, StampFile,
+                            PDFDocViewFile, GSOutputFile, Options,
+                            PDFAFormat);
+////                 If DotNet20Installed And pdfforgeDllInstalled Then
+////                   If Options.PDFUpdateMetadata > 0 Then
+////                   begin
+////                     m := CreateObject('pdfForge.pdf.pdf');
+////                     Tempfile := GetTempFile(GetTempPathApi, '~MP');
+////                     KillFile(Tempfile);
+////                     m.UpdateXMPMetadata(GSOutputFile, Tempfile);
+////                     If FileExists(Tempfile) then
+////                       If KillFile(GSOutputFile) then
+////                         Name(Tempfile As GSOutputFile);
+////                   end;
+////                 If Options.PDFSigningSignPDF = 1 then
+////                   SignPDF(GSOutputFile);
+               end;
+  End;
+End;
+
+Function CreatePDFDocInfoFile(InfoSpoolFile: String; PDFDocInfo: tPDFDocInfo);
+var fn: LongInt;
+    MetadataString, DocInfoStr, Path, aFile, PDFDocInfoFile: String;
+begin
+  MetadataString := GetMetadataString(PDFDocInfo);
+  SplitPath(InfoSpoolFile,'',Path,'',aFile);
+  PDFDocInfoFile := CompletePath(Path) + aFile + '.mtd';
+  If FileExists(InfoSpoolFile) And (Length(MetadataString) > 0) Then
+  begin
+   DocInfoStr := #13 + '/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse';
+   DocInfoStr := DocInfoStr + #13 + '[';
+   DocInfoStr := DocInfoStr + #13 + MetadataString;
+   DocInfoStr := DocInfoStr + #13 + '/DOCINFO pdfmark';
+   DocInfoStr := DocInfoStr + #13 + '%%EOF';
+   fn := FreeFile;
+   Open PDFDocInfoFile For Output As fn
+   Print #fn, DocInfoStr;
+   Close #fn
+   Result := PDFDocInfoFile;
+  End;
+End;
+
+
+Public Function CreatePDFDocViewFile(InfoSpoolFile As String, PageLayout As Long, PageMode As Long, StartPage As Long)
+'---ErrPtnr-OnError-START--- DO NOT MODIFY ! ---
+On Error GoTo ErrPtnr_OnError
+'---ErrPtnr-OnError-END--- DO NOT MODIFY ! ---
+50010  Dim fn As Long, DocViewStr As String, Path As String, File As String, PDFDocViewFile As String
+50020  If PageLayout > 0 Or PageMode > 0 Or StartPage <> 1 Then
+50030   SplitPath InfoSpoolFile, , Path, , File
+50040   PDFDocViewFile = CompletePath(Path) & File & ".dvw"
+50050   If FileExists(InfoSpoolFile) = True Then
+50060    DocViewStr = Chr$(13) & "/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse"
+50070    DocViewStr = DocViewStr & Chr$(13) & "["
+50080    If PageLayout > 0 Then
+50090     DocViewStr = DocViewStr & Chr$(13) & "/PageLayout"
+50101     Select Case PageLayout
+           Case 1:
+50120       DocViewStr = DocViewStr & " /OneColumn"
+50130      Case 2:
+50140       DocViewStr = DocViewStr & " /TwoColumnLeft"
+50150      Case 3:
+50160       DocViewStr = DocViewStr & " /TwoColumnRight"
+50170      Case 4:
+50180       DocViewStr = DocViewStr & " /TwoPageLeft"
+50190      Case 5:
+50200       DocViewStr = DocViewStr & " /TwoPageRight"
+50210      Case Else:
+50220       DocViewStr = DocViewStr & " /SinglePage"
+50230     End Select
+50240    End If
+50250    If PageMode > 0 Then
+50260     DocViewStr = DocViewStr & Chr$(13) & "/PageMode"
+50271     Select Case PageMode
+           Case 1:
+50290       DocViewStr = DocViewStr & " /UseOutlines"
+50300      Case 2:
+50310       DocViewStr = DocViewStr & " /UseThumbs"
+50320      Case 3:
+50330       DocViewStr = DocViewStr & " /FullScreen"
+50340      Case 4:
+50350       DocViewStr = DocViewStr & " /UseOC"
+50360      Case 5:
+50370       DocViewStr = DocViewStr & " /UseAttachments"
+50380      Case Else:
+50390       DocViewStr = DocViewStr & " /UseNone"
+50400     End Select
+50410    End If
+50420    If StartPage > 1 Then
+50430     DocViewStr = DocViewStr & " /Page " & CStr(StartPage)
+50440    End If
+50450    DocViewStr = DocViewStr & Chr$(13) & "/DOCVIEW pdfmark"
+50460    DocViewStr = DocViewStr & Chr$(13) & "%%EOF"
+50470    fn = FreeFile
+50480    Open PDFDocViewFile For Output As fn
+50490    Print #fn, DocViewStr;
+50500    Close #fn
+50510    CreatePDFDocViewFile = PDFDocViewFile
+50520   End If
+50530  End If
+'---ErrPtnr-OnError-START--- DO NOT MODIFY ! ---
+Exit Function
+ErrPtnr_OnError:
+Select Case ErrPtnr.OnError("modPDF", "CreatePDFDocViewFile")
+Case 0: Resume
+Case 1: Resume Next
+Case 2: Exit Function
+Case 3: End
+End Select
+'---ErrPtnr-OnError-END--- DO NOT MODIFY ! ---
+End Function
+
+
+Public Function CreateStampFile(InfoSpoolFileName As String) As String
+'---ErrPtnr-OnError-START--- DO NOT MODIFY ! ---
+On Error GoTo ErrPtnr_OnError
+'---ErrPtnr-OnError-END--- DO NOT MODIFY ! ---
+50010  Dim StampPage As String, tStr As String, R As String, G As String, b As String, Path As String, ff As Long, _
+  StampFile As String, StampString As String, StampFontsize As Double, StampOutlineFontthickness As Double
+50030  Dim File As String
+50040  StampString = RemoveLeadingAndTrailingQuotes(Trim$(Options.StampString))
+50050  If Len(StampString) > 0 Then
+50060   StampPage = StrConv(LoadResData(101, "STAMPPAGE"), vbUnicode)
+50070   StampPage = Replace(StampPage, vbCrLf, vbCr, , , vbBinaryCompare)
+50080   StampPage = Replace(StampPage, "[STAMPSTRING]", EncodeCharsOctal(StampString), , , vbTextCompare)
+50090   StampPage = Replace(StampPage, "[FONTNAME]", Replace(Trim$(Options.StampFontname), " ", ""), , , vbTextCompare)
+50100   StampFontsize = 48
+50110   If IsNumeric(Options.StampFontsize) = True Then
+50120    If CDbl(Options.StampFontsize) > 0 Then
+50130     StampFontsize = CDbl(Options.StampFontsize)
+50140    End If
+50150   End If
+50160   StampPage = Replace(StampPage, "[FONTSIZE]", StampFontsize, , , vbTextCompare)
+50170   StampOutlineFontthickness = 0
+50180   If IsNumeric(Options.StampOutlineFontthickness) = True Then
+50190    If CDbl(Options.StampOutlineFontthickness) >= 0 Then
+50200     StampOutlineFontthickness = CDbl(Options.StampOutlineFontthickness)
+50210    End If
+50220   End If
+50230   StampPage = Replace(StampPage, "[STAMPOUTLINEFONTTHICKNESS]", StampOutlineFontthickness, , , vbTextCompare)
+50240   If Options.StampUseOutlineFont <> 1 Then
+50250     StampPage = Replace(StampPage, "[USEOUTLINEFONT]", "show", , , vbTextCompare)
+50260    Else
+50270     StampPage = Replace(StampPage, "[USEOUTLINEFONT]", "true charpath stroke", , , vbTextCompare)
+50280   End If
+50290   If Len(Options.StampFontColor) > 0 Then
+50300     tStr = Replace$(Options.StampFontColor, "#", "&H")
+50310     If IsNumeric(tStr) = True Then
+50320       R = Replace$(Format(CDbl((CLng(tStr) And CLng("&HFF0000")) / 65536) / 255#, "0.00"), ",", ".", , 1)
+50330       G = Replace$(Format(CDbl((CLng(tStr) And CLng("&H00FF00")) / 256) / 255#, "0.00"), ",", ".", , 1)
+50340       b = Replace$(Format(CDbl(CLng(tStr) And CLng("&H0000FF")) / 255#, "0.00"), ",", ".", , 1)
+50350       StampPage = Replace(StampPage, "[FONTCOLOR]", R & " " & G & " " & b, , , vbTextCompare)
+50360      Else
+50370       StampPage = Replace(StampPage, "[FONTCOLOR]", "1 0 0", , , vbTextCompare)
+50380     End If
+50390    Else
+50400     StampPage = Replace(StampPage, "[FONTCOLOR]", "1 0 0", , , vbTextCompare)
+50410   End If
+50420   SplitPath InfoSpoolFileName, , Path, , File
+50430   StampFile = CompletePath(Path) & File & ".stm"
+50440   ff = FreeFile
+50450   Open StampFile For Output As #ff
+50460   Print #ff, StampPage
+50470   Close #ff
+50480   CreateStampFile = StampFile
+50490  End If
+'---ErrPtnr-OnError-START--- DO NOT MODIFY ! ---
+Exit Function
+ErrPtnr_OnError:
+Select Case ErrPtnr.OnError("modGhostScript", "CreateStampFile")
+Case 0: Resume
+Case 1: Resume Next
+Case 2: Exit Function
+Case 3: End
+End Select
+'---ErrPtnr-OnError-END--- DO NOT MODIFY ! ---
+End Function
+
+
+
+var Options: tOptions;
+    PDFDocInfoFile,StampFile: string;
+
+begin
+  try
+    Fillchar(Options,sizeof(tOptions),0);
+    PDFDocInfoFile = CreatePDFDocInfoFile(InfoSpoolFileName, PDFDocInfo);
+    StampFile = CreateStampFile(InfoSpoolFileName);
+
+    CallGScript('J:\Work\Документ+подписан+электронной+ци.doc',
+                'J:\Work\Документ+подписан+электронной+ци.pdf', Options,
+                PDFAWriter, PDFDocInfoFile, StampFile,
+>>>>>>> origin/master
                 PDFDocViewFile);
   except
     on E: Exception do
