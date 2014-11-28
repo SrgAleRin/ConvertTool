@@ -2,11 +2,7 @@ unit GhostAPI;
 
 interface
 
-<<<<<<< HEAD
   Function CallGS(astrGSArgs: array of string): Boolean;
-=======
-Function CallGS(astrGSArgs: array of string): Boolean;
->>>>>>> origin/master
 
 implementation
 uses SysUtils;
@@ -94,24 +90,15 @@ begin
     For intCounter := 0 To intElementCount do
     begin
       aAnsiArgs[intCounter] := astrGSArgs[intCounter];
-<<<<<<< HEAD
-      aPtrArgs[intCounter] := Integer(@aAnsiArgs[intCounter]);
-    end;
-    ptrArgs := Integer(@aPtrArgs[0]);
-    intReturn := gsapi_init_with_args(intGSInstanceHandle, intElementCount + 1, ptrArgs);
-  //       ' Stop the Ghostscript interpreter
-=======
       aPtrArgs[intCounter] := PChar(aAnsiArgs[intCounter]);
     end;
     ptrArgs := @aPtrArgs[0];
-    intReturn := gsapi_init_with_args(intGSInstanceHandle, intElementCount + 1, integer(ptrArgs));
->>>>>>> origin/master
+    intReturn := gsapi_init_with_args(intGSInstanceHandle, intElementCount + 1, Integer(ptrArgs));
     gsapi_exit(intGSInstanceHandle);
   end;
 
   gsapi_delete_instance (intGSInstanceHandle);
   If (intReturn >= 0) Then
-<<<<<<< HEAD
     Result := True
   Else
   begin
@@ -122,11 +109,6 @@ begin
 //    end;
     Result := False;
   End;
-=======
-   CallGS := True
-  Else
-   CallGS := False;
->>>>>>> origin/master
 End;
 
 

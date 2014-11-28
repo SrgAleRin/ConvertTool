@@ -222,11 +222,7 @@ End;
 
 
 procedure CreatePDFA(const InfoSpoolFileName,PDFDocInfoFile,
-<<<<<<< HEAD
                     StampFile,PDFDocViewFile: String; var GSOutputFile: string;
-=======
-                    StampFile,PDFDocViewFile: String; GSOutputFile: string;
->>>>>>> origin/master
                     Options: tOptions; PDFAFormat: tPDFAFormat);
 var tStr: String;
     AdditionalFiles: TStringList;
@@ -286,11 +282,7 @@ begin
   end;
 
   If (Options.AllowSpecialGSCharsInFilenames = 1) And (Options.OneFilePerPage <> 1) Then
-<<<<<<< HEAD
     GSOutputFile := StringReplace(GSOutputFile, '%', '%%', [rfReplaceAll, rfIgnoreCase]);
-=======
-    GSOutputFile := StringReplace(GSOutputFile, '%', '%%',[rfReplaceAll, rfIgnoreCase]);
->>>>>>> origin/master
   AddParams('-sOutputFile=' + GSOutputFile);
 
   If Options.DontUseDocumentSettings = 0 Then
@@ -346,210 +338,6 @@ begin
   GSInit(Options);
 
   Case Ghostscriptdevice of
-<<<<<<< HEAD
-    PDFAWriter:
-       begin //PDFA
-         CreatePDFA(GSInfoSpoolFile, PDFDocInfoFile, StampFile, PDFDocViewFile,
-                    GSOutputFile, Options, PDFAFormat);
-         If DotNet20Installed And pdfforgeDllIsInstalled Then
-           If Options.PDFUpdateMetadata > 0 Then
-           begin
-//             m := CreateObject('pdfForge.pdf.pdf');
-//             Tempfile := GetTempFile(GetTempPathApi, '~MP');
-//             KillFile(Tempfile);
-//             m.UpdateXMPMetadata(GSOutputFile, Tempfile);
-//             If FileExists(Tempfile) then
-//               If KillFile(GSOutputFile) then
-//                 Name(Tempfile As GSOutputFile);
-           end;
-//         If Options.PDFSigningSignPDF = 1 then
-//           SignPDF(GSOutputFile);
-       end;
-  End;
-End;
-
-procedure ConvertFile(const InputFilename, OutputFilename: String; SubFormat: String = '');
-begin
-  Dim Ext As String, ivgf As Boolean, inFile As String, File As String, psFileName As String
-  Dim InfoSpoolFileName As String, PDFDocInfoFile As String, StampFile As String, PDFDocViewFile As String
-  Dim PDFDocInfo As tPDFDocInfo, tDate As Date
-  Dim PSHeader As tPSHeader, dateStr As String, strGUID As String
-  Dim dateCreated As Date, dateAccessed As Date, dateWritten As Date
-  Dim isf As clsInfoSpoolFile
-
-  IFIsPS = False
-  If LenB(InputFilename) = 0 Then
-   Exit Sub
-  End If
-  If FileExists(InputFilename) = False Then
-   If LenB(InputFilename) > 0 Then
-    MsgBox LanguageStrings.MessagesMsg14 & vbCrLf & vbCrLf & _
-    "InputFile -IF" & vbCrLf & ">" & InputFilename & "<", vbExclamation + vbOKOnly
-   End If
-   Exit Sub
-  End If
-  ivgf = IsValidGraphicFile(InputFilename)
-  If LenB(OutputFilename) > 0 Then
-    tDate = Now
-    dateStr = CStr(tDate)
-    If IsPostscriptFile(InputFilename) = True Or ivgf Or IsPDFFile(InputFilename) Then
-      If GsDllLoaded = 0 Then
-       Exit Sub
-      End If
-      GsDllLoaded = LoadDLL(CompletePath(Options.DirectoryGhostscriptBinaries) & GsDll)
-      If GsDllLoaded = 0 Then
-       MsgBox LanguageStrings.MessagesMsg08
-      End If
-      inFile = InputFilename
-      strGUID = GetGUID
-      File = GetPDFCreatorSpoolDirectory & strGUID
-      If ivgf Then
-       psFileName = File & ".ps"
-       If Image2PS(InputFilename, psFileName) Then
-         inFile = psFileName
-        Else
-         IfLoggingWriteLogfile "ConvertFile: There is a problem converting '" & InputFilename & "'!"
-         Exit Sub
-       End If
-      End If
-      InfoSpoolFileName = CreateInfoSpoolFile(inFile, File & ".inf", , , , , , , , False)
-      If IsPostscriptFile(inFile) = True Then
-        PSHeader = GetPSHeader(inFile)
-        If LenB(PSHeader.CreationDate.Comment) > 0 Then
-         dateStr = FormatPrintDocumentDate(PSHeader.CreationDate.Comment)
-        End If
-       Else
-        If GetFileTimes(inFile, dateCreated, dateAccessed, dateWritten, True) Then
-         dateStr = CStr(dateCreated)
-        End If
-      End If
-     Else
-      InfoSpoolFileName = InputFilename
-      inFile = InputFilename
-      If LenB(InfoSpoolFileName) > 0 Then
-       Set isf = New clsInfoSpoolFile
-       isf.ReadInfoFile InfoSpoolFileName
-       If LenB(isf.FirstSpoolFileName) > 0 Then
-        If IsPostscriptFile(isf.FirstSpoolFileName) = True Then
-          PSHeader = GetPSHeader(isf.FirstSpoolFileName)
-          If LenB(PSHeader.CreationDate.Comment) > 0 Then
-            dateStr = FormatPrintDocumentDate(PSHeader.CreationDate.Comment)
-           Else
-            If GetFileTimes(isf.FirstSpoolFileName, dateCreated, dateAccessed, dateWritten, True) Then
-             dateStr = CStr(dateCreated)
-            End If
-          End If
-         Else
-          If GetFileTimes(isf.FirstSpoolFileName, dateCreated, dateAccessed, dateWritten, True) Then
-           dateStr = CStr(dateCreated)
-          End If
-        End If
-       End If
-      End If
-    End If
-
-    SplitPath OutputFilename, , , , , Ext
-
-    Set isf = New clsInfoSpoolFile
-    isf.ReadInfoFile InfoSpoolFileName
-    With PDFDocInfo
-     If Len(Trim$(Options.StandardTitle)) > 0 Then
-       .Author = GetSubstFilename(InfoSpoolFileName, RemoveLeadingAndTrailingQuotes(Trim$(Options.StandardTitle)), , , True)
-      Else
-       .Author = GetSubstFilename(InfoSpoolFileName, Options.SaveFilename, , , True)
-     End If
-     If Options.UseStandardAuthor = 1 Then
-       .Creator = GetSubstFilename(InfoSpoolFileName, RemoveLeadingAndTrailingQuotes(Trim$(Options.StandardAuthor)), True, , True)
-      Else
-       If IsPostscriptFile(isf.FirstSpoolFileName) Then
-         .Creator = GetDocUsernameFromPostScriptFile(isf.FirstSpoolFileName, False)
-        Else
-         .Creator = isf.FirstUserName
-       End If
-     End If
-     If Len(Trim$(Options.StandardKeywords)) > 0 Then
-      .Keywords = GetSubstFilename(InfoSpoolFileName, RemoveLeadingAndTrailingQuotes(Trim$(Options.StandardKeywords)), , , True)
-     End If
-     If Len(Trim$(Options.StandardSubject)) > 0 Then
-      .Subject = GetSubstFilename(InfoSpoolFileName, RemoveLeadingAndTrailingQuotes(Trim$(Options.StandardSubject)), , , True)
-     End If
-
-     .CreationDate = GetDocDate(Options.StandardCreationdate, Options.StandardDateformat, dateStr)
-     .ModifyDate = GetDocDate(Options.StandardModifydate, Options.StandardDateformat, dateStr)
-     .Creator = App.EXEName & " Version " & App.Major & "." & App.Minor & "." & App.Revision
-    End With
-
-    PDFDocInfoFile = CreatePDFDocInfoFile(InfoSpoolFileName, PDFDocInfo)
-    StampFile = CreateStampFile(InfoSpoolFileName)
-    If Options.PDFPageLayout > 0 Or Options.PDFPageMode > 0 Or Options.PDFStartPage > 1 Then
-     PDFDocViewFile = CreatePDFDocViewFile(InfoSpoolFileName, Options.PDFPageLayout, Options.PDFPageMode, Options.PDFStartPage)
-    End If
-
-    Select Case UCase$(Ext)
-          Case "PDF"
-      Select Case UCase(SubFormat)
-            Case "PDF/A-1B"
-        CallGScript InfoSpoolFileName, OutputFilename, Options, PDFAWriter, PDFDocInfoFile, StampFile, PDFDocViewFile, PDFA1b
-       Case "PDF/A-2B"
-        CallGScript InfoSpoolFileName, OutputFilename, Options, PDFAWriter, PDFDocInfoFile, StampFile, PDFDocViewFile, PDFA2b
-       Case "PDF/X"
-        CallGScript InfoSpoolFileName, OutputFilename, Options, PDFXWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-       Case Else
-        CallGScript InfoSpoolFileName, OutputFilename, Options, PDFWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-      End Select
-     Case "PNG"
-      CallGScript InfoSpoolFileName, OutputFilename, Options, PNGWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-     Case "JPG"
-      CallGScript InfoSpoolFileName, OutputFilename, Options, JPEGWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-     Case "BMP"
-51330      CallGScript InfoSpoolFileName, OutputFilename, Options, BMPWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51340     Case "PCX"
-51350      CallGScript InfoSpoolFileName, OutputFilename, Options, PCXWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51360     Case "TIF"
-51370      CallGScript InfoSpoolFileName, OutputFilename, Options, TIFFWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51380     Case "PS"
-51390      CallGScript InfoSpoolFileName, OutputFilename, Options, PSWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51400     Case "EPS"
-51410      CallGScript InfoSpoolFileName, OutputFilename, Options, EPSWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51420     Case "TXT"
-51430      CallGScript InfoSpoolFileName, OutputFilename, Options, TXTWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51440     Case "PCL"
-51450      CallGScript InfoSpoolFileName, OutputFilename, Options, PCLWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51460     Case "PSD"
-51470      CallGScript InfoSpoolFileName, OutputFilename, Options, PSDWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51480     Case "RAW"
-51490      CallGScript InfoSpoolFileName, OutputFilename, Options, RAWWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51500     Case "SVG"
-51510      CallGScript InfoSpoolFileName, OutputFilename, Options, SVGWriter, PDFDocInfoFile, StampFile, PDFDocViewFile
-51520    End Select
-51530
-51540    KillFile InfoSpoolFileName
-51550    KillFile PDFDocInfoFile
-51560    KillFile StampFile
-51570
-51580    ConvertedOutputFilename = OutputFilename
-51590    ReadyConverting = True
-51600    Exit Sub
-51610   Else
-51620    If FileExists(InputFilename) = True Then
-51630     If IsPostscriptFile(InputFilename) = True Then
-51640       IFIsPS = True
-51650      Else
-51660       MsgBox LanguageStrings.MessagesMsg06 & vbCrLf & vbCrLf & InputFilename
-51670     End If
-51680    End If
-51690  End If
-51700  DoEvents
-End;
-
-var Options: TOptions;
-
-begin
-  try
-    FillChar(Options,SizeOf(Options),#0);
-    CallGScript('G:\garbage\описание проблемы.docx', 'G:\garbage\описание проблемы.pdf', Options,
-                Options.AutosaveFormat, PDFDocInfoFile, StampFile,
-=======
     PDFAWriter: begin //PDFA
                  CreatePDFA(GSInfoSpoolFile, PDFDocInfoFile, StampFile,
                             PDFDocViewFile, GSOutputFile, Options,
@@ -567,7 +355,7 @@ begin
 ////                   end;
 ////                 If Options.PDFSigningSignPDF = 1 then
 ////                   SignPDF(GSOutputFile);
-               end;
+                end;
   End;
 End;
 
