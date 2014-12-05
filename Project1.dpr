@@ -368,88 +368,79 @@ begin
   PDFDocInfoFile := CompletePath(Path) + aFile + '.mtd';
   If FileExists(InfoSpoolFile) And (Length(MetadataString) > 0) Then
   begin
-   DocInfoStr := #13 + '/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse';
-   DocInfoStr := DocInfoStr + #13 + '[';
-   DocInfoStr := DocInfoStr + #13 + MetadataString;
-   DocInfoStr := DocInfoStr + #13 + '/DOCINFO pdfmark';
-   DocInfoStr := DocInfoStr + #13 + '%%EOF';
-   fn := FreeFile;
-   Open PDFDocInfoFile For Output As fn
-   Print #fn, DocInfoStr;
-   Close #fn
-   Result := PDFDocInfoFile;
-  End;
+    DocInfoStr := #13 + '/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse';
+    DocInfoStr := DocInfoStr + #13 + '[';
+    DocInfoStr := DocInfoStr + #13 + MetadataString;
+    DocInfoStr := DocInfoStr + #13 + '/DOCINFO pdfmark';
+    DocInfoStr := DocInfoStr + #13 + '%%EOF';
+    fn := FreeFile;
+//    Open PDFDocInfoFile For Output As fn
+//    Print #fn, DocInfoStr;
+//    Close #fn
+    Result := PDFDocInfoFile;
+//    End;
+  end;
 End;
 
 
-Public Function CreatePDFDocViewFile(InfoSpoolFile As String, PageLayout As Long, PageMode As Long, StartPage As Long)
-'---ErrPtnr-OnError-START--- DO NOT MODIFY ! ---
-On Error GoTo ErrPtnr_OnError
-'---ErrPtnr-OnError-END--- DO NOT MODIFY ! ---
-50010  Dim fn As Long, DocViewStr As String, Path As String, File As String, PDFDocViewFile As String
-50020  If PageLayout > 0 Or PageMode > 0 Or StartPage <> 1 Then
-50030   SplitPath InfoSpoolFile, , Path, , File
-50040   PDFDocViewFile = CompletePath(Path) & File & ".dvw"
-50050   If FileExists(InfoSpoolFile) = True Then
-50060    DocViewStr = Chr$(13) & "/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse"
-50070    DocViewStr = DocViewStr & Chr$(13) & "["
-50080    If PageLayout > 0 Then
-50090     DocViewStr = DocViewStr & Chr$(13) & "/PageLayout"
-50101     Select Case PageLayout
+
+Function CreatePDFDocViewFile(InfoSpoolFile: String; PageLayout, PageMode, StartPage: Integer): string;
+var fn: Integer;
+    DocViewStr, Path, aFile, PDFDocViewFile: String;
+begin
+  If (PageLayout > 0) Or (PageMode > 0) Or (StartPage <> 1) Then
+   SplitPath InfoSpoolFile, , Path, , File
+   PDFDocViewFile = CompletePath(Path) & File & ".dvw"
+   If FileExists(InfoSpoolFile) = True Then
+    DocViewStr = Chr$(13) & "/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse"
+    DocViewStr = DocViewStr & Chr$(13) & "["
+    If PageLayout > 0 Then
+     DocViewStr = DocViewStr & Chr$(13) & "/PageLayout"
+     Select Case PageLayout
            Case 1:
-50120       DocViewStr = DocViewStr & " /OneColumn"
-50130      Case 2:
-50140       DocViewStr = DocViewStr & " /TwoColumnLeft"
-50150      Case 3:
-50160       DocViewStr = DocViewStr & " /TwoColumnRight"
-50170      Case 4:
-50180       DocViewStr = DocViewStr & " /TwoPageLeft"
-50190      Case 5:
-50200       DocViewStr = DocViewStr & " /TwoPageRight"
-50210      Case Else:
-50220       DocViewStr = DocViewStr & " /SinglePage"
-50230     End Select
-50240    End If
-50250    If PageMode > 0 Then
-50260     DocViewStr = DocViewStr & Chr$(13) & "/PageMode"
-50271     Select Case PageMode
+       DocViewStr = DocViewStr & " /OneColumn"
+      Case 2:
+       DocViewStr = DocViewStr & " /TwoColumnLeft"
+      Case 3:
+       DocViewStr = DocViewStr & " /TwoColumnRight"
+      Case 4:
+       DocViewStr = DocViewStr & " /TwoPageLeft"
+      Case 5:
+       DocViewStr = DocViewStr & " /TwoPageRight"
+      Case Else:
+       DocViewStr = DocViewStr & " /SinglePage"
+     End Select
+    End If
+    If PageMode > 0 Then
+     DocViewStr = DocViewStr & Chr$(13) & "/PageMode"
+     Select Case PageMode
            Case 1:
-50290       DocViewStr = DocViewStr & " /UseOutlines"
-50300      Case 2:
-50310       DocViewStr = DocViewStr & " /UseThumbs"
-50320      Case 3:
-50330       DocViewStr = DocViewStr & " /FullScreen"
-50340      Case 4:
-50350       DocViewStr = DocViewStr & " /UseOC"
-50360      Case 5:
-50370       DocViewStr = DocViewStr & " /UseAttachments"
-50380      Case Else:
-50390       DocViewStr = DocViewStr & " /UseNone"
-50400     End Select
-50410    End If
-50420    If StartPage > 1 Then
-50430     DocViewStr = DocViewStr & " /Page " & CStr(StartPage)
-50440    End If
-50450    DocViewStr = DocViewStr & Chr$(13) & "/DOCVIEW pdfmark"
-50460    DocViewStr = DocViewStr & Chr$(13) & "%%EOF"
-50470    fn = FreeFile
-50480    Open PDFDocViewFile For Output As fn
-50490    Print #fn, DocViewStr;
-50500    Close #fn
-50510    CreatePDFDocViewFile = PDFDocViewFile
-50520   End If
-50530  End If
-'---ErrPtnr-OnError-START--- DO NOT MODIFY ! ---
-Exit Function
-ErrPtnr_OnError:
-Select Case ErrPtnr.OnError("modPDF", "CreatePDFDocViewFile")
-Case 0: Resume
-Case 1: Resume Next
-Case 2: Exit Function
-Case 3: End
-End Select
-'---ErrPtnr-OnError-END--- DO NOT MODIFY ! ---
-End Function
+       DocViewStr = DocViewStr & " /UseOutlines"
+      Case 2:
+       DocViewStr = DocViewStr & " /UseThumbs"
+      Case 3:
+       DocViewStr = DocViewStr & " /FullScreen"
+      Case 4:
+       DocViewStr = DocViewStr & " /UseOC"
+      Case 5:
+       DocViewStr = DocViewStr & " /UseAttachments"
+      Case Else:
+       DocViewStr = DocViewStr & " /UseNone"
+     End Select
+    End If
+    If StartPage > 1 Then
+     DocViewStr = DocViewStr & " /Page " & CStr(StartPage)
+    End If
+    DocViewStr = DocViewStr & Chr$(13) & "/DOCVIEW pdfmark"
+    DocViewStr = DocViewStr & Chr$(13) & "%%EOF"
+    fn = FreeFile
+    Open PDFDocViewFile For Output As fn
+    Print #fn, DocViewStr;
+    Close #fn
+    CreatePDFDocViewFile = PDFDocViewFile
+   End If
+  End If
+End;
 
 
 Public Function CreateStampFile(InfoSpoolFileName As String) As String
