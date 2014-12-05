@@ -359,7 +359,7 @@ begin
   End;
 End;
 
-Function CreatePDFDocInfoFile(InfoSpoolFile: String; PDFDocInfo: tPDFDocInfo);
+Function CreatePDFDocInfoFile(InfoSpoolFile: String; PDFDocInfo: tPDFDocInfo): string;
 var fn: LongInt;
     MetadataString, DocInfoStr, Path, aFile, PDFDocInfoFile: String;
 begin
