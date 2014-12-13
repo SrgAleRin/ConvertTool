@@ -13,6 +13,7 @@ uses CustomTypes;
   Function pdfforgeDllIsInstalled(): Boolean;
   function EncodeChars(CodePage: LongInt; Keyword: string): string;
   function InStrRev(ASource, ToFind: String): Integer;
+  Function GetMetadataString(PDFDocInfo: tPDFDocInfo): String;
 
 implementation
 uses SysUtils, Registry, Windows, Classes, System.StrUtils;
